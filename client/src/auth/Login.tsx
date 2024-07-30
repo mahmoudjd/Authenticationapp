@@ -1,21 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import InputElement from "../components/InputElement";
 import ButtonElement from "../components/ButtonElement";
+import { useAuth } from "../context/AuthContext";
 
-function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<null | string>(null);
+const Login: React.FC = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Verhindert das Neuladen der Seite
-    if (!password || !email) {
-      setError("invalid email or password");
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !password) {
+      setError("Invalid email or password");
       return;
     }
+
     try {
       const response = await fetch("http://localhost:3000/auth/login", {
         method: "POST",
@@ -26,46 +30,48 @@ function Login() {
       });
 
       const data = await response.json();
-      if (data && data.token) {
-        setError("");
+      if (data.token) {
+        setError(null);
+        login(data.token);
         navigate("/home");
+      } else {
+        setError(data.message || "Login failed");
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+      console.error(err);
     }
   };
 
   return (
     <div className="flex items-center justify-center mt-28">
-      <div className="w-100 border rounded bg-white px-8 py-12">
+      <div className="w-full max-w-md border rounded bg-white px-8 py-12 shadow-md">
         <form onSubmit={handleSubmit}>
-          <h3 className="text-2xl mb-7">Login</h3>
+          <h3 className="text-2xl mb-7 text-center">Login</h3>
           <InputElement
-            placeholder="Email: "
+            placeholder="Email"
             value={email}
             setValue={setEmail}
             type="email"
           />
-
           <InputElement
-            placeholder="Password: "
+            placeholder="Password"
             value={password}
             setValue={setPassword}
             type="password"
           />
-
           {error && <p className="text-red-500 text-xs pb-1">{error}</p>}
           <ButtonElement title="Login" />
         </form>
         <p className="text-sm text-center mt-5">
-          you do not have an Account,{" "}
-          <Link to={"/signup"} className="font-medium text-blue-600 underline">
+          Don't have an account?{" "}
+          <Link to="/signup" className="font-medium text-blue-600 underline">
             Create Account
           </Link>
         </p>
       </div>
     </div>
   );
-}
+};
 
 export default Login;
