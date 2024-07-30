@@ -13,7 +13,7 @@ function InputElement({ placeholder, type, value, setValue }: Props) {
       placeholder={placeholder}
       type={type}
       value={value}
-      onChange={(e) => setValue(e.target.value)}
+      onChange={({ target }) => setValue(target.value)}
     />
   );
 }

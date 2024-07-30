@@ -27,6 +27,13 @@ export const getUser = async (req: Request | any, res: Response) => {
 export const signup = async (req: Request, res: Response) => {
   const { firstName, lastName, email, password } = req.body;
   try {
+    const isUsed = await User.findOne({ email });
+    if (isUsed) {
+      return res.status(401).json({
+        error: true,
+        message: "Email is existed!",
+      });
+    }
     bcrypt.hash(password, 10).then(async (hash) => {
       const user = await User.create({
         firstName,
