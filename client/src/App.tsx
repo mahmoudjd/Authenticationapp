@@ -4,13 +4,14 @@ import Login from "./auth/Login";
 import Signup from "./auth/Signup";
 import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
-function App() {
+
+const App = () => {
   return (
     <>
       <Header />
       <Router>
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route index path="/" element={<Login />} />
           <Route
             path="/home"
             element={
@@ -24,6 +25,6 @@ function App() {
       </Router>
     </>
   );
-}
+};
 
 export default App;
